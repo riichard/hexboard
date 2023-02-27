@@ -1,23 +1,24 @@
-
 package keys
 
 import (
-	"golang.org/x/term"
 	"os"
+
+	"golang.org/x/term"
 )
 
 const (
-	Home  = 1
-	Left  = 2
-	CtrlC = 3
-	CtrlD = 4
-	End   = 5
-	Right = 6
-	Backspace = 8
-	Enter  = 13
-	Escape = 27
-	Down   = 14
-	Up     = 16
+	Home           = 1
+	Left           = 2
+	CtrlC          = 3
+	CtrlD          = 4
+	End            = 5
+	Right          = 6
+	Backspace      = 8
+	Enter          = 13
+	Linebreak      = 10
+	Escape         = 27
+	Down           = 14
+	Up             = 16
 	otherBackspace = 127
 )
 
@@ -46,43 +47,42 @@ func Raw(file *os.File, keys chan<- byte) {
 		}
 
 		switch c {
-			case Escape:
-				cmd, err := getC(file)
+		case Escape:
+			cmd, err := getC(file)
+			if err != nil {
+				break
+			}
+			if cmd == byte('[') {
+				cmd2, err := getC(file)
 				if err != nil {
 					break
 				}
-				if cmd == byte('[') {
-					cmd2, err := getC(file)
-					if err != nil {
-						break
-					}
-					switch cmd2 {
-						case byte('A'):
-							keys <- Up
-						case byte('B'):
-							keys <- Down
-						case byte('C'):
-							keys <- Right
-						case byte('D'):
-							keys <- Left
-						case byte('E'):
-							keys <- Home
-						case byte('F'):
-							keys <- End
-						default:
-							keys <- c
-							keys <- cmd
-							keys <- cmd2
-					}
-				} else {
+				switch cmd2 {
+				case byte('A'):
+					keys <- Up
+				case byte('B'):
+					keys <- Down
+				case byte('C'):
+					keys <- Right
+				case byte('D'):
+					keys <- Left
+				case byte('E'):
+					keys <- Home
+				case byte('F'):
+					keys <- End
+				default:
 					keys <- c
 					keys <- cmd
+					keys <- cmd2
 				}
-			case otherBackspace:
-				keys <- Backspace
-			default:
+			} else {
 				keys <- c
+				keys <- cmd
+			}
+		case otherBackspace:
+			keys <- Backspace
+		default:
+			keys <- c
 		}
 	}
 }
-
