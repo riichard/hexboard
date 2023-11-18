@@ -4,10 +4,11 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 )
 
 const (
-	HOST = "localhost"
+	HOST = "0.0.0.0"
 	PORT = "8080"
 	TYPE = "tcp"
 )
@@ -46,7 +47,7 @@ func handleRequest(conn net.Conn, ch chan<- byte) {
 		if v != 0 {
 			// log.Default().Printf("(%v) ", v)
 			ch <- v
-			// time.Sleep(16 * time.Millisecond)
+			time.Sleep(30 * time.Millisecond)
 		}
 	}
 
