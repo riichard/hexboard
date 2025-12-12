@@ -45,6 +45,7 @@ func main() {
 	tick := time.NewTicker(time.Second / time.Duration(fps))
 	for {
 		if _, err := io.ReadFull(os.Stdin, buf[:]); err != nil {
+			print("break")
 			break
 		}
 
@@ -52,6 +53,7 @@ func main() {
 			buf_f64[i] = gmap[buf[i]]
 		}
 
+		print("writing buffer")
 		out.Write(buf_f64[:])
 
 		<-tick.C

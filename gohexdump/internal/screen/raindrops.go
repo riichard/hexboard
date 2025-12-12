@@ -85,8 +85,11 @@ type RaindropFilter struct {
 }
 
 func symmetricTransform(pos Vector2) Vector2 {
-	return Vector2 { X: (pos.X-600)*550/(pos.Y+500)/5, Y: 1100000/(pos.Y+500)/5 }
-//    return Vector2 { X: pos.X/2.5, Y: pos.Y }
+	//return Vector2 { X: pos.X*3, Y: pos.Y*3 } // (pos.X-200)*350/(pos.Y+150)/5, Y: 11000/(pos.Y+100)/1 }
+	return Vector2 { X: (pos.X-200)*350/(pos.Y+150)/5, Y: 11000/(pos.Y+100)/1 }
+	// return Vector2 { X: (pos.X-200)*550/(pos.Y+150)/5, Y: 11000/(pos.Y+100)/1 }
+	// return Vector2 { X: (pos.X-600)*550/(pos.Y+500)/5, Y: 1100000/(pos.Y+500)/5 }
+	// return Vector2 { X: pos.X/2.5, Y: pos.Y }
 }
 
 
