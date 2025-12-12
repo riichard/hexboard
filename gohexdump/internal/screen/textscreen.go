@@ -280,12 +280,11 @@ func (s *textScreen) SegmentCoord(ix int) Vector2 {
 
 
 func (s *textScreen) Coords() []Vector2 {
-	coords := make([]Vector2, len(s.positions))
-	for i := range coords {
-		coords[i] = s.SegmentCoord(i)
-	}
-
-	return coords
+    coords := make([]Vector2, s.SegmentCount()) // 16 * DigitCount
+    for i := range coords {
+        coords[i] = s.SegmentCoord(i)
+    }
+    return coords
 }
 
 func (s *textScreen) NextFrame(f, old *FrameBuffer, tick uint64) bool {

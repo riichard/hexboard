@@ -1,6 +1,5 @@
 package drivers
 
-/*
 
 #include <sys/ioctl.h>
 #include <asm/termbits.h>
@@ -31,7 +30,6 @@ int set_binary(int fd)
 	return ioctl(fd, TCSETS2, &tio);
 }
 
-*/
 import "C"
 
 import (

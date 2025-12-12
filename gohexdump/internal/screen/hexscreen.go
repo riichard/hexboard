@@ -27,45 +27,13 @@ type hexScreen struct {
 }
 
 var hexConfig = Configuration{
-
-	{  0, 2, VerticalPanel }, // offset
-	{  2, 2, VerticalPanel },
-	{  4, 2, VerticalPanel },
-	{  6, 2, VerticalPanel },
-
-	{ 13, 2, VerticalPanel }, // hex bytes
-	{ 16, 2, VerticalPanel },
-	{ 19, 2, VerticalPanel },
-	{ 22, 2, VerticalPanel },
-	{ 25, 2, VerticalPanel },
-	{ 28, 2, VerticalPanel },
-	{ 31, 2, VerticalPanel },
-	{ 34, 2, VerticalPanel },
-
-	{ 41, 2, VerticalPanel },
-	{ 44, 2, VerticalPanel },
-	{ 47, 2, VerticalPanel },
-	{ 50, 2, VerticalPanel },
-	{ 53, 2, VerticalPanel },
-	{ 56, 2, VerticalPanel },
-	{ 59, 2, VerticalPanel },
-	{ 62, 2, VerticalPanel },
-
-	{ 69, 2, VerticalPanel }, // ascii representations
-	{ 71, 2, VerticalPanel },
-	{ 73, 2, VerticalPanel },
-	{ 75, 2, VerticalPanel },
-	{ 77, 2, VerticalPanel },
-	{ 79, 2, VerticalPanel },
-	{ 81, 2, VerticalPanel },
-	{ 83, 2, VerticalPanel },
-
-	{  0, 0, HorizontalPanel },
-	{ 32, 0, HorizontalPanel },
-
+	{ 0, 0, HorizontalPanel },
+	{ 0, 1, HorizontalPanel },
+	{ 0, 2, HorizontalPanel },
+	{ 0, 3, HorizontalPanel },
 }
 
-const hexStartRow = 2
+const hexStartRow = 0
 var hexColumns = []int{13,16,19,22,25,28,31,34,41,44,47,50,53,56,59,62}
 const offsetColumn = 0
 const asciiColumn = 69
