@@ -8,7 +8,7 @@ SERVICE_DEST := /etc/systemd/system/hexboard.service
 
 # Sync sources, build on device, and restart via systemd (or plain if not installed)
 deploy: sync build
-	ssh $(DEVICE) 'systemctl is-active --quiet hexboard && systemctl restart hexboard || true'
+	ssh $(DEVICE) 'sudo systemctl restart hexboard'
 
 # Sync source tree to device
 sync:
@@ -20,7 +20,7 @@ build:
 
 # Stop any running instance (systemd or plain)
 stop:
-	ssh $(DEVICE) 'systemctl stop hexboard 2>/dev/null || pkill $(BINARY) 2>/dev/null; true'
+	ssh $(DEVICE) 'sudo systemctl stop hexboard 2>/dev/null || pkill $(BINARY) 2>/dev/null; true'
 
 # Start in the foreground (interactive, bypasses systemd)
 run: stop
