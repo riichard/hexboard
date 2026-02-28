@@ -1,0 +1,11 @@
+# Video files
+*.raw
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.wmv
+
+# Encoded video output (encvid working files)
+gohexdump/cmd/encvid/*.bin
