@@ -19,7 +19,6 @@ type Driver struct {
 func init() {
 	flag.UintVar(&baudrate, "baudrate", 1500000, "serial baudrate")
 	flag.StringVar(&serialDevice, "device", "/dev/ttyACM0", "serial output device")
-	flag.Parse()
 }
 
 func findActiveSerialDevice() string {

@@ -67,7 +67,7 @@ func (d *raindrop) Render(f *FrameBuffer, old *FrameBuffer, tick uint64) {
 			b := d.brightness
 
 			r := rand.Uint32()
-			for i := 0; i< 32; i++ {
+			for i := 0; i< 16; i++ {
 				if (1<<uint32(i)) & r != 0 {
 					f.frame[index*16 + i] += b
 				}
