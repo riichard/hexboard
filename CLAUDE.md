@@ -65,10 +65,19 @@ screenChan <- newMyScreen()
 - Many raindrop columns (>31) are outside the HexScreen grid and silently no-op via `DigitIndex` returning -1
 - `NewRaindropFilter` takes a `TextScreen` — pass the inner `HexScreen`, not the `FilterScreen` wrapper
 
+## Web interface
+
+`cmd/hexboard/web.go` — HTTP server on port 8081 (flag: `-webport`).
+
+- `GET /` — renders the HTML form with a recent-messages list
+- `POST /` — calls `send(msg)` which pushes to `screenChan` and starts a rain-return timer in a goroutine
+
+Recent messages are kept in memory (last 10). Each recent item is a hidden-input form so clicking it re-sends with no JS required.
+
 ## Sending a test message
 
 ```bash
-echo "hello" | nc txt 8080
-# or
-make test-message MSG="hello" -C gohexdump
+echo "hello" | nc txt 8080          # TCP
+curl -d "message=hello" txt:8081    # HTTP
+open http://txt:8081                # web UI
 ```

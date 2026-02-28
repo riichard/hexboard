@@ -22,26 +22,33 @@ The display will immediately show the raindrop animation.
 
 ## Sending messages
 
+### Web interface (recommended)
+
+Open `http://txt:8081` in a browser. Type a message and tap **SEND**. Recent messages are listed below and can be re-sent with one tap.
+
+Works on mobile.
+
+### TCP (scripting)
+
 Send any newline-terminated string over TCP to port 8080:
 
 ```bash
 echo "hello world" | nc txt 8080
 ```
 
-The display switches to the message (uppercased) for 30 seconds, then returns to rain.
-
 **From a script:**
 ```bash
 echo "deploy complete" | nc txt 8080
 ```
 
-**With a custom timeout** (set at startup, not per-message):
+---
+
+The display shows the message (uppercased) for 30 seconds then returns to rain. Multiple messages sent in quick succession each start their own timer — the last one to expire wins.
+
+**Custom timeout** (set at startup):
 ```bash
-# Start with a 1-minute display time
 ssh txt 'nohup ~/hexboard -timeout 1m > /tmp/hexboard.log 2>&1 &'
 ```
-
-Multiple messages sent in quick succession each reset the timer independently. The last message to expire wins.
 
 ## Makefile targets
 
@@ -69,6 +76,7 @@ make deploy DEVICE=192.168.178.67
 -device string     serial output device (default "/dev/ttyACM0")
 -baudrate uint     serial baudrate (default 1500000)
 -port string       TCP port to listen on (default "8080")
+-webport string    HTTP port for web interface (default "8081")
 -timeout duration  time to show message before returning to rain (default 30s)
 -verbose           print FPS to stdout
 ```

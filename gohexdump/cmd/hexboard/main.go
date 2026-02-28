@@ -59,7 +59,8 @@ func tcpListener(port string, screenChan chan<- screen.Screen, timeout time.Dura
 }
 
 func main() {
-	port := flag.String("port", "8080", "TCP port to listen on")
+	port    := flag.String("port", "8080", "TCP port to listen on")
+	webport := flag.String("webport", "8081", "HTTP port for web interface")
 	timeout := flag.Duration("timeout", 30*time.Second, "time to show message before returning to rain")
 	flag.Parse()
 
@@ -70,6 +71,7 @@ func main() {
 	screenChan <- newRainScreen()
 
 	go tcpListener(*port, screenChan, *timeout)
+	go startWebServer(":"+*webport, screenChan, *timeout)
 
 	q := make(chan bool)
 	screen.DisplayRoutine(drivers.GetDriver(refScreen.SegmentCount()), multi, refScreen, q)
