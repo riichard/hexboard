@@ -19,8 +19,9 @@ The `drivers` package uses Linux CGo (`asm/termbits.h`) — **build on the devic
 
 ```bash
 cd gohexdump
-make deploy    # sync + build + restart
-make run       # foreground interactive session
+make install   # first-time: sync + build + install systemd service
+make deploy    # after changes: sync + build + restart service
+make run       # foreground interactive session (bypasses systemd)
 ```
 
 Code is synced via `rsync` (no GitHub SSH key on device). After local changes, always `make deploy` or at minimum `make sync && make build`.
@@ -67,17 +68,30 @@ screenChan <- newMyScreen()
 
 ## Web interface
 
-`cmd/hexboard/web.go` — HTTP server on port 8081 (flag: `-webport`).
+`cmd/hexboard/web.go` — HTTP server on port 80 (flag: `-webport`), runs as root via systemd.
 
 - `GET /` — renders the HTML form with a recent-messages list
 - `POST /` — calls `send(msg)` which pushes to `screenChan` and starts a rain-return timer in a goroutine
 
-Recent messages are kept in memory (last 10). Each recent item is a hidden-input form so clicking it re-sends with no JS required.
+Multi-line messages: newlines in the form textarea are split by `\n` in `newMessageScreen`; each line is written to its own row (0–3), truncated to 32 chars. Recent messages kept in memory (last 10). Each recent item is a hidden-input form so clicking re-sends with no JS.
+
+## systemd
+
+Service file: `gohexdump/hexboard.service` — deployed to `/etc/systemd/system/hexboard.service`.
+Runs as `root` (needed for port 80 and `/dev/ttyACM0`). Enabled at boot.
+
+```bash
+make install    # deploy service file, enable, start
+make status     # systemctl status hexboard
+make log        # journalctl -fu hexboard
+make uninstall  # stop, disable, remove service file
+```
 
 ## Sending a test message
 
 ```bash
-echo "hello" | nc txt 8080          # TCP
-curl -d "message=hello" txt:8081    # HTTP
-open http://txt:8081                # web UI
+echo "hello" | nc txt 8080                     # TCP
+printf "line1\nline2" | nc txt 8080            # TCP multi-line
+curl -d "message=hello" http://txt/            # HTTP
+open http://txt                                # web UI
 ```

@@ -29,7 +29,13 @@ func newMessageScreen(message string) screen.Screen {
 	s := screen.NewTextScreen(conf)
 	s.SetFont(font.GetFont())
 	s.SetStyle(screen.NewBrightness(1))
-	s.WriteAt(strings.ToUpper(message), 0, 0)
+	for row, line := range strings.SplitN(strings.ToUpper(message), "\n", 4) {
+		runes := []rune(line)
+		if len(runes) > 32 {
+			runes = runes[:32]
+		}
+		s.WriteAt(string(runes), 0, row)
+	}
 	filters := []screen.Filter{screen.DefaultGamma(), screen.NewAfterGlowFilter(.85)}
 	return screen.NewFilterScreen(s, filters)
 }
@@ -60,7 +66,7 @@ func tcpListener(port string, screenChan chan<- screen.Screen, timeout time.Dura
 
 func main() {
 	port    := flag.String("port", "8080", "TCP port to listen on")
-	webport := flag.String("webport", "8081", "HTTP port for web interface")
+	webport := flag.String("webport", "80", "HTTP port for web interface")
 	timeout := flag.Duration("timeout", 30*time.Second, "time to show message before returning to rain")
 	flag.Parse()
 

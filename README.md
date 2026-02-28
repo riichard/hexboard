@@ -13,18 +13,26 @@ A wall-mounted 16-segment LED display driven by a Raspberry Pi. Shows a raindrop
 
 ## Quick start
 
+First-time setup — installs and enables the systemd service so it starts on boot:
+
 ```bash
 cd gohexdump
-make deploy   # sync code → build on device → start in background
+make install
 ```
 
-The display will immediately show the raindrop animation.
+After code changes:
+
+```bash
+make deploy   # sync + build + restart service
+```
+
+The display shows the raindrop animation. Open `http://txt` to send messages.
 
 ## Sending messages
 
 ### Web interface (recommended)
 
-Open `http://txt:8081` in a browser. Type a message and tap **SEND**. Recent messages are listed below and can be re-sent with one tap.
+Open `http://txt` in a browser. Type up to 4 lines and tap **SEND**. Recent messages are listed below and can be re-sent with one tap.
 
 Works on mobile.
 
@@ -56,14 +64,16 @@ Run from `gohexdump/`:
 
 | Target | Description |
 |---|---|
-| `make deploy` | Sync sources + build on device + restart in background |
+| `make install` | Sync + build + install systemd service (run once to set up) |
+| `make deploy` | Sync + build + restart the running service |
 | `make sync` | Rsync sources to device only |
 | `make build` | Build binary on device only |
-| `make restart` | Kill existing process and start new one in background |
-| `make run` | Interactive foreground session (SSH with TTY) |
-| `make stop` | Kill the running hexboard process |
-| `make log` | Tail `/tmp/hexboard.log` on the device |
-| `make test-message MSG="hi"` | Send a test message |
+| `make run` | Interactive foreground session (SSH with TTY, bypasses systemd) |
+| `make stop` | Stop the running process |
+| `make status` | Show systemd service status |
+| `make log` | Live journal output (`journalctl -fu hexboard`) |
+| `make uninstall` | Remove the systemd service |
+| `make test-message MSG="hi"` | Send a test message over TCP |
 
 Override the target device with `DEVICE=`:
 ```bash
@@ -76,7 +86,7 @@ make deploy DEVICE=192.168.178.67
 -device string     serial output device (default "/dev/ttyACM0")
 -baudrate uint     serial baudrate (default 1500000)
 -port string       TCP port to listen on (default "8080")
--webport string    HTTP port for web interface (default "8081")
+-webport string    HTTP port for web interface (default "80")
 -timeout duration  time to show message before returning to rain (default 30s)
 -verbose           print FPS to stdout
 ```

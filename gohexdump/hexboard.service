@@ -1,0 +1,14 @@
+[Unit]
+Description=Hexboard LED display
+After=network.target
+
+[Service]
+ExecStart=/home/pi/hexboard
+Restart=on-failure
+RestartSec=5
+User=root
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
