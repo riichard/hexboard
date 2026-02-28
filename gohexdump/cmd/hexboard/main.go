@@ -20,37 +20,64 @@ var hexConf = screen.Configuration{
 	{0, 3, screen.HorizontalPanel},
 }
 
-// identity transform — ripples radiate outward in screen-space (rectripple style)
+// identity transform — ripples radiate in screen-space (same as rectripple)
 func identityTransform(v screen.Vector2) screen.Vector2 { return v }
 
-// newDefaultScreen returns the idle rectripple screen and its cursor.
-// The same pair is reused for the lifetime of the process so cursor
-// position is preserved across message display cycles.
-func newDefaultScreen() (screen.Screen, screen.Cursor) {
+// display holds the two long-lived screen objects and the shared cursor.
+//
+//   rain   — matrix raindrop animation shown when idle
+//   ripple — rectripple screen used when a message is displayed;
+//            text is written into its text layer on each message
+//   cursor — shared RippleCursor; editor updates always go here
+type display struct {
+	rain   screen.Screen
+	ripple screen.Screen
+	text   screen.TextScreen
+	cursor screen.Cursor
+}
+
+func newDisplay() *display {
+	// Idle: matrix rain
+	hex := screen.NewHexScreen()
+	hex.SetFont(font.GetFont())
+	rain := screen.NewFilterScreen(hex, []screen.Filter{
+		screen.NewRaindropFilter(hex),
+		screen.DefaultGamma(),
+	})
+
+	// Text display: rectripple with cursor
 	s := screen.NewTextScreen(hexConf)
 	s.SetFont(font.GetFont())
 	s.SetStyle(screen.NewBrightness(1))
 	cursor := screen.NewRippleCursor(1, .5, nil, identityTransform, s)
-	filters := []screen.Filter{cursor, screen.DefaultGamma(), screen.NewAfterGlowFilter(.85)}
-	return screen.NewFilterScreen(s, filters), cursor
+	ripple := screen.NewFilterScreen(s, []screen.Filter{
+		cursor,
+		screen.DefaultGamma(),
+		screen.NewAfterGlowFilter(.85),
+	})
+
+	return &display{rain: rain, ripple: ripple, text: s, cursor: cursor}
 }
 
-func newMessageScreen(message string) screen.Screen {
-	s := screen.NewTextScreen(hexConf)
-	s.SetFont(font.GetFont())
-	s.SetStyle(screen.NewBrightness(1))
-	for row, line := range strings.SplitN(strings.ToUpper(message), "\n", 4) {
+// showMessage writes msg into the rectripple text layer, switches to it,
+// then returns to rain after timeout. Safe to call from multiple goroutines.
+func (d *display) showMessage(msg string, screenChan chan<- screen.Screen, timeout time.Duration) {
+	d.text.Clear()
+	for row, line := range strings.SplitN(strings.ToUpper(msg), "\n", 4) {
 		runes := []rune(line)
 		if len(runes) > 32 {
 			runes = runes[:32]
 		}
-		s.WriteAt(string(runes), 0, row)
+		d.text.WriteAt(string(runes), 0, row)
 	}
-	filters := []screen.Filter{screen.DefaultGamma(), screen.NewAfterGlowFilter(.85)}
-	return screen.NewFilterScreen(s, filters)
+	screenChan <- d.ripple
+	go func() {
+		time.Sleep(timeout)
+		screenChan <- d.rain
+	}()
 }
 
-func tcpListener(port string, screenChan chan<- screen.Screen, idleScreen screen.Screen, timeout time.Duration) {
+func tcpListener(port string, screenChan chan<- screen.Screen, d *display, timeout time.Duration) {
 	listen, err := net.Listen("tcp", "0.0.0.0:"+port)
 	if err != nil {
 		return
@@ -65,10 +92,7 @@ func tcpListener(port string, screenChan chan<- screen.Screen, idleScreen screen
 			defer conn.Close()
 			scanner := bufio.NewScanner(conn)
 			if scanner.Scan() {
-				msg := scanner.Text()
-				screenChan <- newMessageScreen(msg)
-				time.Sleep(timeout)
-				screenChan <- idleScreen
+				d.showMessage(scanner.Text(), screenChan, timeout)
 			}
 		}(conn)
 	}
@@ -110,15 +134,15 @@ func main() {
 	refScreen := screen.NewHexScreen()
 	refScreen.SetFont(font.GetFont())
 
-	idleScreen, cursor := newDefaultScreen()
-	cursor.SetCursor(0, 0)
+	d := newDisplay()
+	d.cursor.SetCursor(0, 0)
 
 	multi, screenChan := screen.NewMultiScreen()
-	screenChan <- idleScreen
+	screenChan <- d.rain
 
-	go tcpListener(*port, screenChan, idleScreen, *timeout)
-	go cursorListener(*cursorport, cursor)
-	go startWebServer(":"+*webport, screenChan, idleScreen, cursor, *timeout)
+	go tcpListener(*port, screenChan, d, *timeout)
+	go cursorListener(*cursorport, d.cursor)
+	go startWebServer(":"+*webport, screenChan, d, *timeout)
 
 	q := make(chan bool)
 	screen.DisplayRoutine(drivers.GetDriver(refScreen.SegmentCount()), multi, refScreen, q)

@@ -15,8 +15,7 @@ const maxRecent = 10
 
 type webHandler struct {
 	screenChan chan<- screen.Screen
-	idleScreen screen.Screen
-	cursor     screen.Cursor
+	d          *display
 	timeout    time.Duration
 	mu         sync.Mutex
 	recent     []string
@@ -30,11 +29,7 @@ func (h *webHandler) send(msg string) {
 	}
 	h.mu.Unlock()
 
-	h.screenChan <- newMessageScreen(msg)
-	go func() {
-		time.Sleep(h.timeout)
-		h.screenChan <- h.idleScreen
-	}()
+	h.d.showMessage(msg, h.screenChan, h.timeout)
 }
 
 func (h *webHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +45,7 @@ func (h *webHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		col, errCol := strconv.Atoi(r.FormValue("x"))
 		row, errRow := strconv.Atoi(r.FormValue("y"))
 		if errCol == nil && errRow == nil {
-			h.cursor.SetCursor(col, row)
+			h.d.cursor.SetCursor(col, row)
 		}
 		w.WriteHeader(http.StatusNoContent)
 
@@ -72,11 +67,10 @@ func (h *webHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func startWebServer(addr string, screenChan chan<- screen.Screen, idleScreen screen.Screen, cursor screen.Cursor, timeout time.Duration) {
+func startWebServer(addr string, screenChan chan<- screen.Screen, d *display, timeout time.Duration) {
 	h := &webHandler{
 		screenChan: screenChan,
-		idleScreen: idleScreen,
-		cursor:     cursor,
+		d:          d,
 		timeout:    timeout,
 	}
 	fmt.Printf("web interface on %s\n", addr)
