@@ -11,6 +11,32 @@ A wall-mounted 16-segment LED display driven by a Raspberry Pi. Shows a raindrop
 - Raspberry Pi (ARM) connected via serial (`/dev/ttyACM0`)
 - Device hostname: `txt`
 
+## Editor cursor integration
+
+The display mirrors your editor cursor in real time using the rectripple effect — ripples radiate outward from wherever your cursor is.
+
+**Neovim** — add to `init.lua`:
+
+```lua
+-- load from repo
+vim.opt.runtimepath:append('/path/to/hexboard/editor')
+require('hexboard').setup({ host = 'txt', port = 8082 })
+
+-- or if you cloned the repo locally, just source the file:
+-- require('/path/to/hexboard/editor/hexboard').setup()
+```
+
+The cursor position is mapped onto the 4×32 display grid:
+- `col = editor_col % 32`
+- `row = (editor_line - 1) % 4`
+
+You can also set the cursor programmatically:
+
+```bash
+echo "10 2" | nc txt 8082          # TCP: col=10 row=2
+curl -d "x=10&y=2" http://txt/cursor  # HTTP
+```
+
 ## Quick start
 
 First-time setup — installs and enables the systemd service so it starts on boot:
@@ -83,12 +109,13 @@ make deploy DEVICE=192.168.178.67
 ## `hexboard` flags
 
 ```
--device string     serial output device (default "/dev/ttyACM0")
--baudrate uint     serial baudrate (default 1500000)
--port string       TCP port to listen on (default "8080")
--webport string    HTTP port for web interface (default "80")
--timeout duration  time to show message before returning to rain (default 30s)
--verbose           print FPS to stdout
+-device string      serial output device (default "/dev/ttyACM0")
+-baudrate uint      serial baudrate (default 1500000)
+-port string        TCP port for text messages (default "8080")
+-webport string     HTTP port for web interface (default "80")
+-cursorport string  TCP port for cursor position updates (default "8082")
+-timeout duration   time to show message before returning to idle (default 30s)
+-verbose            print FPS to stdout
 ```
 
 ## Other commands

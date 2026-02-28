@@ -28,10 +28,16 @@ Code is synced via `rsync` (no GitHub SSH key on device). After local changes, a
 
 ## Main program: `cmd/hexboard`
 
-- Shows raindrop animation by default
-- Switches to uppercase text on TCP message (port 8080, newline-terminated)
-- Returns to rain after `-timeout` (default 30s)
+- **Default (idle) mode:** rectripple cursor effect — blank screen with rippling cursor, using identity transform (ripples propagate in screen-space)
+- **Message mode:** switches to uppercase text on TCP message (port 8080) or web POST
+- Returns to idle (`idleScreen`) after `-timeout` (default 30s) — the **same** screen object is reused so cursor position persists
+- **Cursor port (8082):** accepts persistent TCP connections; each line `col row\n` calls `cursor.SetCursor(col, row)`
+- **HTTP `/cursor`:** `POST x=<col>&y=<row>` (204 No Content)
 - `screen.MultiScreen` handles switching: last value pushed to `screenChan` wins
+
+### Key design: long-lived idle screen
+
+`idleScreen` and `cursor` are created once in `main()` and shared across all goroutines. When returning from message mode, goroutines push `idleScreen` back onto `screenChan` (not a freshly constructed screen). This preserves cursor position across display switches.
 
 ## Architecture: `internal/screen`
 
@@ -90,8 +96,15 @@ make uninstall  # stop, disable, remove service file
 ## Sending a test message
 
 ```bash
-echo "hello" | nc txt 8080                     # TCP
-printf "line1\nline2" | nc txt 8080            # TCP multi-line
-curl -d "message=hello" http://txt/            # HTTP
-open http://txt                                # web UI
+echo "hello" | nc txt 8080                       # TCP text message
+printf "line1\nline2" | nc txt 8080              # TCP multi-line
+curl -d "message=hello" http://txt/              # HTTP text message
+open http://txt                                  # web UI
+
+echo "10 2" | nc txt 8082                        # TCP cursor: col=10 row=2
+curl -d "x=10&y=2" http://txt/cursor             # HTTP cursor
 ```
+
+## Editor plugin
+
+`editor/hexboard.lua` — Neovim Lua plugin. Connects persistently to port 8082 on `CursorMoved`/`CursorMovedI`, sends `col row\n`, debounced to 40 ms. Reconnects on `FocusGained`.

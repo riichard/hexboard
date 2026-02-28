@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
@@ -13,6 +15,8 @@ const maxRecent = 10
 
 type webHandler struct {
 	screenChan chan<- screen.Screen
+	idleScreen screen.Screen
+	cursor     screen.Cursor
 	timeout    time.Duration
 	mu         sync.Mutex
 	recent     []string
@@ -29,29 +33,53 @@ func (h *webHandler) send(msg string) {
 	h.screenChan <- newMessageScreen(msg)
 	go func() {
 		time.Sleep(h.timeout)
-		h.screenChan <- newRainScreen()
+		h.screenChan <- h.idleScreen
 	}()
 }
 
 func (h *webHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		if msg := r.FormValue("message"); msg != "" {
-			h.send(msg)
+	switch r.URL.Path {
+
+	case "/cursor":
+		// POST /cursor  body: x=<col>&y=<row>
+		// Lightweight endpoint for editor plugins to update cursor position.
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
 		}
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
+		col, errCol := strconv.Atoi(r.FormValue("x"))
+		row, errRow := strconv.Atoi(r.FormValue("y"))
+		if errCol == nil && errRow == nil {
+			h.cursor.SetCursor(col, row)
+		}
+		w.WriteHeader(http.StatusNoContent)
+
+	default:
+		if r.Method == http.MethodPost {
+			if msg := r.FormValue("message"); msg != "" {
+				h.send(msg)
+			}
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
+		h.mu.Lock()
+		recent := append([]string{}, h.recent...)
+		h.mu.Unlock()
+
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		indexTmpl.Execute(w, recent)
 	}
-
-	h.mu.Lock()
-	recent := append([]string{}, h.recent...)
-	h.mu.Unlock()
-
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	indexTmpl.Execute(w, recent)
 }
 
-func startWebServer(addr string, screenChan chan<- screen.Screen, timeout time.Duration) {
-	h := &webHandler{screenChan: screenChan, timeout: timeout}
+func startWebServer(addr string, screenChan chan<- screen.Screen, idleScreen screen.Screen, cursor screen.Cursor, timeout time.Duration) {
+	h := &webHandler{
+		screenChan: screenChan,
+		idleScreen: idleScreen,
+		cursor:     cursor,
+		timeout:    timeout,
+	}
+	fmt.Printf("web interface on %s\n", addr)
 	http.ListenAndServe(addr, h)
 }
 
@@ -107,7 +135,6 @@ var indexTmpl = template.Must(template.New("").Parse(`<!DOCTYPE html>
     outline: none;
     resize: none;
     line-height: 1.6;
-    /* fixed height: 4 rows */
     height: calc(4 * 1.6em + 1.7rem);
     -webkit-appearance: none;
     overflow: hidden;
@@ -118,7 +145,6 @@ var indexTmpl = template.Must(template.New("").Parse(`<!DOCTYPE html>
     box-shadow: 0 0 0 3px #00ff4122;
   }
 
-  /* row ruler — 4 faint dividers behind the textarea */
   .row-guides {
     position: absolute;
     inset: 1px;
