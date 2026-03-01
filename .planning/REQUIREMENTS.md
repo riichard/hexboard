@@ -7,8 +7,8 @@
 
 ### History & Persistence
 
-- [ ] **HIST-01**: All sent messages and drawings are persisted to SQLite DB on the Pi
-- [ ] **HIST-02**: History survives server restarts
+- [x] **HIST-01**: All sent messages and drawings are persisted to SQLite DB on the Pi
+- [x] **HIST-02**: History survives server restarts
 - [ ] **HIST-03**: Web UI displays a unified chronological list of all past messages and drawings
 - [ ] **HIST-04**: User can re-send any history item to the display
 - [ ] **HIST-05**: Re-sending from history prompts for display duration (default: stored duration or global default)
@@ -69,8 +69,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HIST-01 | Phase 1 | Pending |
-| HIST-02 | Phase 1 | Pending |
+| HIST-01 | Phase 1 | Complete |
+| HIST-02 | Phase 1 | Complete |
 | HUE-01 | Phase 2 | Pending |
 | HUE-02 | Phase 2 | Pending |
 | HUE-03 | Phase 2 | Pending |

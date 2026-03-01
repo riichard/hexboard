@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 1 of 5 (Store)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-03-01 — Roadmap created
+Plan: 1 of ? in current phase
+Status: In progress
+Last activity: 2026-03-01 — Completed 01-01 (SQLite store package)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 5%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 1 min
+- Total execution time: ~0 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-store | 1 | 1 min | 1 min |
 
 **Recent Trend:**
-- Last 5 plans: -
+- Last 5 plans: 01-01 (1 min)
 - Trend: -
 
 *Updated after each plan completion*
@@ -47,6 +47,9 @@ Recent decisions affecting current work:
 - Hue API: plain net/http, always fire-and-forget goroutine
 - Config: simple file at ~/hexboard.conf or /etc/hexboard.conf
 - Drawing UI: vanilla JS + inline SVG; bit-to-segment mapping shared between Go and JS
+- [01-01] SetMaxOpenConns(1) serialises writes; no store-level mutex needed
+- [01-01] schema type column (DEFAULT 'text') added now for Phase 3 drawing support without migration
+- [01-01] fail-soft pattern: Save returns error, caller logs and continues
 
 ### Pending Todos
 
@@ -60,5 +63,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Roadmap created; no phases planned yet
+Stopped at: Completed 01-01-PLAN.md (SQLite store package)
 Resume file: None
