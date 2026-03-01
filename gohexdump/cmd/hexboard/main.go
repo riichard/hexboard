@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"log"
 	"net"
 	"strings"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"post6.net/gohexdump/internal/drivers"
 	"post6.net/gohexdump/internal/font"
 	"post6.net/gohexdump/internal/screen"
+	"post6.net/gohexdump/internal/store"
 )
 
 var hexConf = screen.Configuration{
@@ -134,6 +136,11 @@ func main() {
 	refScreen := screen.NewHexScreen()
 	refScreen.SetFont(font.GetFont())
 
+	db, err := store.OpenDB()
+	if err != nil {
+		log.Fatalf("store: open DB: %v", err)
+	}
+
 	d := newDisplay()
 	d.cursor.SetCursor(0, 0)
 
@@ -142,7 +149,7 @@ func main() {
 
 	go tcpListener(*port, screenChan, d, *timeout)
 	go cursorListener(*cursorport, d.cursor)
-	go startWebServer(":"+*webport, screenChan, d, *timeout)
+	go startWebServer(":"+*webport, screenChan, d, *timeout, db)
 
 	q := make(chan bool)
 	screen.DisplayRoutine(drivers.GetDriver(refScreen.SegmentCount()), multi, refScreen, q)

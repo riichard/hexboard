@@ -1,14 +1,16 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 
 	"post6.net/gohexdump/internal/screen"
+	"post6.net/gohexdump/internal/store"
 )
 
 const maxRecent = 10
@@ -17,18 +19,13 @@ type webHandler struct {
 	screenChan chan<- screen.Screen
 	d          *display
 	timeout    time.Duration
-	mu         sync.Mutex
-	recent     []string
+	db         *sql.DB
 }
 
 func (h *webHandler) send(msg string) {
-	h.mu.Lock()
-	h.recent = append([]string{msg}, h.recent...)
-	if len(h.recent) > maxRecent {
-		h.recent = h.recent[:maxRecent]
+	if err := store.Save(h.db, msg); err != nil {
+		log.Printf("store: save failed: %v", err)
 	}
-	h.mu.Unlock()
-
 	h.d.showMessage(msg, h.screenChan, h.timeout)
 }
 
@@ -58,20 +55,23 @@ func (h *webHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		h.mu.Lock()
-		recent := append([]string{}, h.recent...)
-		h.mu.Unlock()
+		recent, err := store.Recent(h.db, maxRecent)
+		if err != nil {
+			log.Printf("store: recent failed: %v", err)
+			recent = nil
+		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		indexTmpl.Execute(w, recent)
 	}
 }
 
-func startWebServer(addr string, screenChan chan<- screen.Screen, d *display, timeout time.Duration) {
+func startWebServer(addr string, screenChan chan<- screen.Screen, d *display, timeout time.Duration, db *sql.DB) {
 	h := &webHandler{
 		screenChan: screenChan,
 		d:          d,
 		timeout:    timeout,
+		db:         db,
 	}
 	fmt.Printf("web interface on %s\n", addr)
 	http.ListenAndServe(addr, h)
