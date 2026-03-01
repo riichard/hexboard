@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 1 of 5 (Store)
-Plan: 1 of ? in current phase
+Plan: 2 of 2 in current phase (checkpoint: awaiting human verify)
 Status: In progress
-Last activity: 2026-03-01 — Completed 01-01 (SQLite store package)
+Last activity: 2026-03-01 — Completed 01-02 tasks (store wired into web, deployed to Pi)
 
-Progress: [█░░░░░░░░░] 5%
+Progress: [██░░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 1 min
-- Total execution time: ~0 hours
+- Total plans completed: 2
+- Average duration: ~15 min
+- Total execution time: ~31 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-store | 1 | 1 min | 1 min |
+| 01-store | 2 | 31 min | ~15 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (1 min)
-- Trend: -
+- Last 5 plans: 01-01 (1 min), 01-02 (30 min)
+- Trend: 30 min dominated by sqlite3 CGo compilation on Pi Zero ARMv6
 
 *Updated after each plan completion*
 
@@ -50,6 +50,9 @@ Recent decisions affecting current work:
 - [01-01] SetMaxOpenConns(1) serialises writes; no store-level mutex needed
 - [01-01] schema type column (DEFAULT 'text') added now for Phase 3 drawing support without migration
 - [01-01] fail-soft pattern: Save returns error, caller logs and continues
+- [01-02] Removed sync.Mutex from webHandler: database/sql handles concurrency, store enforces single-connection writes
+- [01-02] log.Fatalf on store.OpenDB failure: missing directory surfaces at startup, not on first request
+- [01-02] No db.Close(): binary runs until killed, OS reclaims file handles on exit
 
 ### Pending Todos
 
@@ -63,5 +66,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 01-01-PLAN.md (SQLite store package)
+Stopped at: 01-02-PLAN.md checkpoint:human-verify (Tasks 1+2 complete, deployed to Pi)
 Resume file: None
