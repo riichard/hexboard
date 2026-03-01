@@ -20,7 +20,7 @@ The display mirrors your editor cursor in real time using the rectripple effect 
 ```lua
 -- load from repo
 vim.opt.runtimepath:append('/path/to/hexboard/editor')
-require('hexboard').setup({ host = 'txt', port = 8082 })
+require('hexboard').setup({ host = 'txt.local', port = 8082 })
 
 -- or if you cloned the repo locally, just source the file:
 -- require('/path/to/hexboard/editor/hexboard').setup()
@@ -33,8 +33,8 @@ The cursor position is mapped onto the 4×32 display grid:
 You can also set the cursor programmatically:
 
 ```bash
-echo "10 2" | nc txt 8082          # TCP: col=10 row=2
-curl -d "x=10&y=2" http://txt/cursor  # HTTP
+echo "10 2" | nc txt.local 8082          # TCP: col=10 row=2
+curl -d "x=10&y=2" http://txt.local/cursor  # HTTP
 ```
 
 ## Quick start
@@ -52,13 +52,13 @@ After code changes:
 make deploy   # sync + build + restart service
 ```
 
-The display shows the raindrop animation. Open `http://txt` to send messages.
+The display shows the raindrop animation. Open `http://txt.local` to send messages.
 
 ## Sending messages
 
 ### Web interface (recommended)
 
-Open `http://txt` in a browser. Type up to 4 lines and tap **SEND**. Recent messages are listed below and can be re-sent with one tap.
+Open `http://txt.local` in a browser. Type up to 4 lines and tap **SEND**. Recent messages are listed below and can be re-sent with one tap.
 
 Works on mobile.
 
@@ -67,12 +67,12 @@ Works on mobile.
 Send any newline-terminated string over TCP to port 8080:
 
 ```bash
-echo "hello world" | nc txt 8080
+echo "hello world" | nc txt.local 8080
 ```
 
 **From a script:**
 ```bash
-echo "deploy complete" | nc txt 8080
+echo "deploy complete" | nc txt.local 8080
 ```
 
 ---
@@ -152,6 +152,12 @@ ffmpeg -i input.mp4 -vf scale=1280:720 -pix_fmt gray -f rawvideo - \
 
 Flags: `-width int` (default 1280), `-height int` (default 720)
 
+## Optional: Philips Hue integration
+
+Sending a message can automatically turn on a Philips Hue light — useful for wall-mounted displays where the room needs to be lit for the message to be visible.
+
+Disabled by default. See [hue.md](hue.md) for setup.
+
 ## Project structure
 
 ```
@@ -164,7 +170,9 @@ gohexdump/
   internal/
     drivers/      # serial driver (CGo, Linux only)
     font/         # 16-segment font
+    hue/          # Philips Hue integration (optional, see hue.md)
     screen/       # display abstractions (TextScreen, filters, animation)
+    store/        # SQLite message history
     tcpserver/    # legacy TCP keyboard input (unused by hexboard)
 ```
 
