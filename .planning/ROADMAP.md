@@ -29,7 +29,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. After `make deploy` restarts the service, previously sent messages still exist in the DB
   3. The DB file lives at a stable path under `/var/lib/hexboard/` with correct permissions
   4. Concurrent reads and writes do not produce SQLITE_BUSY errors (WAL mode active)
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [x] 01-01-PLAN.md — Create internal/store package (OpenDB, Save, Recent) with SQLite + WAL
+- [x] 01-02-PLAN.md — Wire store into web handler and main, deploy with systemd ExecStartPre
 
 ### Phase 2: Hue
 **Goal**: Sending any message or drawing automatically turns on the Hue-connected display light
@@ -40,7 +44,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Sending a message to the display triggers the Hue device to turn on within a few seconds
   3. A Hue failure (unreachable bridge, bad key) does not delay or block the message from displaying
   4. If the config file is absent or incomplete, the service starts normally with Hue silently disabled
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 02-01-PLAN.md — Create internal/hue package, wire into main.go, deploy and verify
 
 ### Phase 3: Drawing
 **Goal**: Users can compose a segment-level drawing in the browser and send it to the display
@@ -83,7 +90,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Store | 2/2 | Complete   | 2026-03-01 |
-| 2. Hue | 0/? | Not started | - |
+| 2. Hue | 0/1 | In progress | - |
 | 3. Drawing | 0/? | Not started | - |
 | 4. Duration | 0/? | Not started | - |
 | 5. History UI | 0/? | Not started | - |
