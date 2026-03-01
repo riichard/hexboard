@@ -3,6 +3,8 @@ Description=Hexboard LED display
 After=network.target
 
 [Service]
+ExecStartPre=/bin/mkdir -p /var/lib/hexboard
+ExecStartPre=/bin/chmod 750 /var/lib/hexboard
 ExecStart=/home/pi/hexboard
 Restart=on-failure
 RestartSec=5
