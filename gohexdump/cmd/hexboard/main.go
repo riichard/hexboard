@@ -11,6 +11,7 @@ import (
 
 	"post6.net/gohexdump/internal/drivers"
 	"post6.net/gohexdump/internal/font"
+	"post6.net/gohexdump/internal/hue"
 	"post6.net/gohexdump/internal/screen"
 	"post6.net/gohexdump/internal/store"
 )
@@ -32,10 +33,11 @@ func identityTransform(v screen.Vector2) screen.Vector2 { return v }
 //            text is written into its text layer on each message
 //   cursor — shared RippleCursor; editor updates always go here
 type display struct {
-	rain   screen.Screen
-	ripple screen.Screen
-	text   screen.TextScreen
-	cursor screen.Cursor
+	rain    screen.Screen
+	ripple  screen.Screen
+	text    screen.TextScreen
+	cursor  screen.Cursor
+	hueConf *hue.Config // nil when Hue is disabled
 }
 
 func newDisplay() *display {
@@ -73,6 +75,9 @@ func (d *display) showMessage(msg string, screenChan chan<- screen.Screen, timeo
 		d.text.WriteAt(string(runes), 0, row)
 	}
 	screenChan <- d.ripple
+	if d.hueConf != nil {
+		go d.hueConf.TurnOn()
+	}
 	go func() {
 		time.Sleep(timeout)
 		screenChan <- d.rain
@@ -141,7 +146,19 @@ func main() {
 		log.Fatalf("store: open DB: %v", err)
 	}
 
+	hueCfg, err := hue.LoadConfig()
+	if err != nil {
+		log.Printf("hue: config error: %v — Hue disabled", err)
+		hueCfg = nil
+	}
+	if hueCfg != nil {
+		log.Printf("hue: enabled (bridge=%s device=%s)", hueCfg.BridgeIP, hueCfg.DeviceID)
+	} else {
+		log.Printf("hue: disabled (no config or config error)")
+	}
+
 	d := newDisplay()
+	d.hueConf = hueCfg
 	d.cursor.SetCursor(0, 0)
 
 	multi, screenChan := screen.NewMultiScreen()
