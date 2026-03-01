@@ -125,6 +125,22 @@ If file is absent or incomplete, service starts normally with "hue: disabled" lo
 
 **No blockers.** Drawing phase can begin immediately.
 
+## Self-Check: PASSED
+
+All deliverables verified:
+
+**Files created:**
+- ✓ gohexdump/internal/hue/hue.go
+- ✓ .planning/phases/02-hue/02-01-SUMMARY.md
+
+**Commits present:**
+- ✓ 0073f74 (Task 1: Create internal/hue package)
+- ✓ 666f83e (Task 2: Wire hue into main.go)
+- ✓ 7fcfab6 (Planning docs)
+
+**Dependencies:**
+- ✓ BurntSushi/toml in go.mod
+
 ---
 *Phase: 02-hue*
 *Completed: 2026-03-01*
