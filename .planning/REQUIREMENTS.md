@@ -30,10 +30,10 @@
 
 ### Hue Integration
 
-- [ ] **HUE-01**: Hue Bridge IP, API key, and device ID are configured via a config file on the Pi
-- [ ] **HUE-02**: When any message or drawing is sent to the display, the Hue device is automatically turned on
-- [ ] **HUE-03**: Hue API call is non-blocking — a Hue failure does not delay or prevent the message from displaying
-- [ ] **HUE-04**: If Hue config is absent or incomplete, the feature is silently disabled (logged, not crashed)
+- [x] **HUE-01**: Hue Bridge IP, API key, and device ID are configured via a config file on the Pi
+- [x] **HUE-02**: When any message or drawing is sent to the display, the Hue device is automatically turned on
+- [x] **HUE-03**: Hue API call is non-blocking — a Hue failure does not delay or prevent the message from displaying
+- [x] **HUE-04**: If Hue config is absent or incomplete, the feature is silently disabled (logged, not crashed)
 
 ## v2 Requirements
 
@@ -71,10 +71,10 @@
 |-------------|-------|--------|
 | HIST-01 | Phase 1 | Complete |
 | HIST-02 | Phase 1 | Complete |
-| HUE-01 | Phase 2 | Pending |
-| HUE-02 | Phase 2 | Pending |
-| HUE-03 | Phase 2 | Pending |
-| HUE-04 | Phase 2 | Pending |
+| HUE-01 | Phase 2 | Complete |
+| HUE-02 | Phase 2 | Complete |
+| HUE-03 | Phase 2 | Complete |
+| HUE-04 | Phase 2 | Complete |
 | DRAW-01 | Phase 3 | Pending |
 | DRAW-02 | Phase 3 | Pending |
 | DRAW-03 | Phase 3 | Pending |
