@@ -12,7 +12,7 @@ Five phases deliver persistent history, drawing capability, configurable duratio
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Store** - SQLite persistence layer for messages and drawings
+- [x] **Phase 1: Store** - SQLite persistence layer for messages and drawings
 - [ ] **Phase 2: Hue** - Smart-switch config and auto-on integration
 - [ ] **Phase 3: Drawing** - Segment picker UI + drawing screen in Go
 - [ ] **Phase 4: Duration** - Global default and per-send duration controls
@@ -82,7 +82,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Store | 2/2 (checkpoint pending) | In progress | - |
+| 1. Store | 2/2 | Complete   | 2026-03-01 |
 | 2. Hue | 0/? | Not started | - |
 | 3. Drawing | 0/? | Not started | - |
 | 4. Duration | 0/? | Not started | - |

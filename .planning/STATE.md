@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** Every message or drawing sent from the web UI should reach the display — even if it was off — and be replayable from history indefinitely.
-**Current focus:** Phase 1 - Store
+**Current focus:** Phase 2 - Hue
 
 ## Current Position
 
-Phase: 1 of 5 (Store)
-Plan: 2 of 2 in current phase (checkpoint: awaiting human verify)
-Status: In progress
-Last activity: 2026-03-01 — Completed 01-02 tasks (store wired into web, deployed to Pi)
+Phase: 2 of 5 (Hue)
+Plan: 0 of ? in current phase
+Status: Phase 1 complete — ready to begin Phase 2
+Last activity: 2026-03-01 — Phase 1 human verify checkpoint approved, Phase 1 complete
 
-Progress: [██░░░░░░░░] 10%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
@@ -66,5 +66,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: 01-02-PLAN.md checkpoint:human-verify (Tasks 1+2 complete, deployed to Pi)
+Stopped at: Phase 1 complete — 01-02-PLAN.md human-verify checkpoint approved
 Resume file: None

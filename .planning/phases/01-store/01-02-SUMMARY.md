@@ -52,7 +52,7 @@ completed: 2026-03-01
 - **Duration:** ~30 min (dominated by sqlite3.c CGo compilation on ARMv6: ~24 min)
 - **Started:** 2026-03-01T15:15:05Z
 - **Completed:** 2026-03-01T15:45:28Z
-- **Tasks:** 2 (+ 1 checkpoint awaiting human verify)
+- **Tasks:** 3 (2 auto + 1 checkpoint:human-verify, approved)
 - **Files modified:** 3
 
 ## Accomplishments
@@ -144,7 +144,7 @@ All plan verification criteria met:
 4. `SELECT content FROM messages ORDER BY id DESC LIMIT 1;` → `verify`
 5. After `sudo systemctl restart hexboard`, step 4 still returns `verify` (HIST-02 verified)
 6. `PRAGMA journal_mode;` → `wal`
-7. Human verify checkpoint: awaiting confirmation of web UI behavior
+7. Human verify checkpoint: approved — web UI shows persistent recent list after restart
 
 ## Deviations from Plan
 
@@ -177,9 +177,9 @@ All plan verification criteria met:
 
 ## Next Phase Readiness
 
-- Phase 1 is functionally complete pending human verification of web UI at http://192.168.178.67
-- The persistence checkpoint (HIST-02) is verified at the CLI level
-- Upon human approval, STATE.md will be updated to mark Phase 1 complete and advance to Phase 2
+- Phase 1 is complete: human verification approved
+- HIST-01 and HIST-02 requirements fulfilled: web POST persists to SQLite, rows survive service restart
+- Phase 2 (Hue) can begin: store package is stable, no API changes expected
 
 ## Self-Check: PASSED
 
@@ -192,4 +192,4 @@ All plan verification criteria met:
 
 ---
 *Phase: 01-store*
-*Completed: 2026-03-01 (pending human checkpoint)*
+*Completed: 2026-03-01*
